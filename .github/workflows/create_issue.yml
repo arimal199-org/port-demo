@@ -1,29 +1,68 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
-# GitHub recommends pinning actions to a commit SHA.
-# To get a newer version, you will need to update the SHA.
-# You can also reference a tag or branch, but the action may change without warning.
-
-name: Weekly Team Sync
 on:
   workflow_dispatch:
-
+    inputs:
+      issue_type:
+        type: string
+      title:
+        type: string
+      labels:
+        type: string
+      asignees:
+        type: string
+      port_payload:
+        required: true
+        description: Port's payload, including details for who triggered the action and
+          general context (blueprint, run id, etc...)
+        type: string
 jobs:
-  create_issue:
-    name: Create team sync issue
+  create-entity-in-port-and-update-run:
     runs-on: ubuntu-latest
-    permissions:
-      issues: write
     steps:
+      - name: UPSERT Entity
+        uses: port-labs/port-github-action@v1
+        with:
+          identifier: some_identifier
+          title: Some Title
+          team: "[]"
+          icon: DefaultBlueprint
+          blueprint: issues
+          properties: |-
+            {
+              "creator": "string",
+              "assignees": [],
+              "labels": [],
+              "status": "open",
+              "createdAt": "2023-10-06T14:44:45.707Z",
+              "closedAt": "2023-10-06T14:44:45.707Z",
+              "updatedAt": "2023-10-06T14:44:45.707Z",
+              "description": "string",
+              "issueNumber": 0,
+              "link": "https://example.com"
+            }
+          relations: |-
+            {
+              "repository": "related_entity_identifier"
+            }
+          clientId: ${{ secrets.PORT_CLIENT_ID }}
+          clientSecret: ${{ secrets.PORT_CLIENT_SECRET }}
+          operation: UPSERT
+          runId: ${{fromJson(inputs.port_payload).context.runId}}
+          
+      - name: Create a log message
+        uses: port-labs/port-github-action@v1
+        with:
+          clientId: ${{ secrets.PORT_CLIENT_ID }}
+          clientSecret: ${{ secrets.PORT_CLIENT_SECRET }}
+          operation: PATCH_RUN
+          runId: ${{fromJson(inputs.port_payload).context.runId}}
+          logMessage: An example of a log message
+          
       - name: Create team sync issue
         uses: imjohnbo/issue-bot@3d96848fb5e9a4a473bb81ae62b4b4866a56e93a
         with:
-          assignees: "monalisa, doctocat, hubot"
-          labels: "weekly sync, docs-team"
-          title: "Team sync"
+          assignees: ${{ inputs.asignees }}
+          labels: ${{ inputs.labels }}
+          title: ${{ inputs.title }}
           body: |
             ### Agenda
 
