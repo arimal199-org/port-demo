@@ -1,0 +1,81 @@
+on:
+  workflow_dispatch:
+    inputs:
+      issue_type:
+        type: string
+      title:
+        type: string
+      labels:
+        type: string
+      asignees:
+        type: string
+      port_payload:
+        required: true
+        description: Port's payload, including details for who triggered the action and
+          general context (blueprint, run id, etc...)
+        type: string
+jobs:
+  create-entity-in-port-and-update-run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: UPSERT Entity
+        uses: port-labs/port-github-action@v1
+        with:
+          identifier: some_identifier
+          title: Some Title
+          team: "[]"
+          icon: DefaultBlueprint
+          blueprint: issues
+          properties: |-
+            {
+              "creator": "string",
+              "assignees": [],
+              "labels": [],
+              "status": "open",
+              "createdAt": "2023-10-06T14:44:45.707Z",
+              "closedAt": "2023-10-06T14:44:45.707Z",
+              "updatedAt": "2023-10-06T14:44:45.707Z",
+              "description": "string",
+              "issueNumber": 0,
+              "link": "https://example.com"
+            }
+          relations: |-
+            {
+              "repository": "related_entity_identifier"
+            }
+          clientId: ${{ secrets.PORT_CLIENT_ID }}
+          clientSecret: ${{ secrets.PORT_CLIENT_SECRET }}
+          operation: UPSERT
+          runId: ${{fromJson(inputs.port_payload).context.runId}}
+          
+      - name: Create a log message
+        uses: port-labs/port-github-action@v1
+        with:
+          clientId: ${{ secrets.PORT_CLIENT_ID }}
+          clientSecret: ${{ secrets.PORT_CLIENT_SECRET }}
+          operation: PATCH_RUN
+          runId: ${{fromJson(inputs.port_payload).context.runId}}
+          logMessage: An example of a log message
+          
+      - name: Create team sync issue
+        uses: imjohnbo/issue-bot@3d96848fb5e9a4a473bb81ae62b4b4866a56e93a
+        with:
+          assignees: ${{ inputs.asignees }}
+          labels: ${{ inputs.labels }}
+          title: ${{ inputs.title }}
+          body: |
+            ### Agenda
+
+            - [ ] Start the recording
+            - [ ] Check-ins
+            - [ ] Discussion points
+            - [ ] Post the recording
+
+            ### Discussion Points
+            Add things to discuss below
+
+            - [Work this week](https://github.com/orgs/github/projects/3)
+          pinned: false
+          close-previous: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
