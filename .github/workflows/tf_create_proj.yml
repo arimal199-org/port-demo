@@ -5,6 +5,10 @@ on:
     inputs:
       providers:
         type: string
+      env:
+        type: string
+      proj:
+        type: string
       port_payload:
         required: true
         description: Port's payload, including details for who triggered the action and
@@ -24,8 +28,8 @@ jobs:
           blueprint: terraform
           properties: |-
             {
-              "env": "string",
-              "proj": "string"
+              "env": "${{inputs.env}}",
+              "proj": "${{inputs.proj}}"
             }
           relations: "{}"
           clientId: ${{ secrets.PORT_CLIENT_ID }}
