@@ -53,5 +53,7 @@ jobs:
           clientId: ${{ secrets.PORT_CLIENT_ID }}
           clientSecret: ${{ secrets.PORT_CLIENT_SECRET }}
           operation: PATCH_RUN
-          runId: ${{fromJson(inputs.port_payload).context.runId}}
+          runId: ${{join(fromJson(inputs.port_payload).context.runId, inputs.providers)}}
           logMessage: ${{join(steps.install_gh_cli.outputs.*, '\n')}}
+          summary: "OK"
+          status: "SUCCESS"
