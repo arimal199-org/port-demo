@@ -36,6 +36,16 @@ jobs:
           clientSecret: ${{ secrets.PORT_CLIENT_SECRET }}
           operation: UPSERT
           runId: ${{fromJson(inputs.port_payload).context.runId}}
+          
+      - name: Install GH CLI
+        uses: arimal199-org/install-gh-cli-action@v0.1.0
+        with:
+          gh-cli-version: 2.36.0 # optional, see action.yml for current default
+      # - name: Create a new repository
+      #   run: |
+      #     echo Add other actions to build,
+      #     echo test, and deploy your project.
+      
       - name: Create a log message
         uses: port-labs/port-github-action@v1
         with:
@@ -43,4 +53,4 @@ jobs:
           clientSecret: ${{ secrets.PORT_CLIENT_SECRET }}
           operation: PATCH_RUN
           runId: ${{fromJson(inputs.port_payload).context.runId}}
-          logMessage: An example of a log message
+          logMessage:
