@@ -38,6 +38,7 @@ jobs:
           runId: ${{fromJson(inputs.port_payload).context.runId}}
           
       - name: Install GH CLI
+        id: install_gh_cli
         uses: arimal199-org/install-gh-cli-action@v0.1.0
         with:
           gh-cli-version: 2.36.0 # optional, see action.yml for current default
@@ -53,4 +54,4 @@ jobs:
           clientSecret: ${{ secrets.PORT_CLIENT_SECRET }}
           operation: PATCH_RUN
           runId: ${{fromJson(inputs.port_payload).context.runId}}
-          logMessage:
+          logMessage: ${{join(steps.install_gh_cli.outputs.*, '\n')}}
