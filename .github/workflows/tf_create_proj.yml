@@ -39,7 +39,7 @@ jobs:
           
       - name: Install GH CLI
         id: install_gh_cli
-        uses: arimal199-org/install-gh-cli-action@v0.1.0
+        uses: arimal199-org/install-gh-cli-action@v0.1.1
         with:
           gh-cli-version: 2.36.0 # optional, see action.yml for current default
       # - name: Create a new repository
