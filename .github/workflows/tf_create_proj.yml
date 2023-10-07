@@ -55,5 +55,5 @@ jobs:
           operation: PATCH_RUN
           runId: ${{join(fromJson(inputs.port_payload).context.runId, inputs.providers)}}
           logMessage: ${{join(steps.install_gh_cli.outputs.*, '\n')}}
-          summary: "OK"
+          summary: "Successfully installed GitHub cli: ${{join(steps.install_gh_cli.outputs.*, '\n')}}"
           status: "SUCCESS"
